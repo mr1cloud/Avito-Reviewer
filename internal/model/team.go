@@ -6,9 +6,9 @@ import (
 )
 
 type TeamMember struct {
-	UserID   string `json:"user_id" db:"user_id"`
-	Username string `json:"username" db:"username"`
-	IsActive bool   `json:"is_active" db:"is_active"`
+	UserID   string `json:"user_id" db:"user_id" validate:"required,max=32"`
+	Username string `json:"username" db:"username" validate:"required,max=64"`
+	IsActive bool   `json:"is_active" db:"is_active" validate:"required"`
 }
 
 type TeamMembers []TeamMember
@@ -29,7 +29,16 @@ func (tm *TeamMembers) Scan(src interface{}) error {
 	}
 }
 
+func (tm *TeamMembers) Contains(userID string) bool {
+	for _, member := range *tm {
+		if member.UserID == userID {
+			return true
+		}
+	}
+	return false
+}
+
 type Team struct {
-	TeamName string      `json:"team_name" db:"team_name"`
-	Members  TeamMembers `json:"members" db:"team_members"`
+	TeamName string      `json:"team_name" db:"team_name" validate:"required,max=64"`
+	Members  TeamMembers `json:"members" db:"members" validate:"dive"`
 }

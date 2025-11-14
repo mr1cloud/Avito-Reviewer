@@ -1,9 +1,9 @@
 -- +goose Up
 -- +goose StatementBegin
-CREATE TYPE pr_status AS ENUM ('open', 'merged');
+CREATE TYPE pr_status AS ENUM ('OPEN', 'MERGED');
 
 CREATE TABLE teams (
-    team_name VARCHAR(64) NOT NULL UNIQUE
+    team_name VARCHAR(64) PRIMARY KEY UNIQUE
 );
 
 CREATE TABLE users (

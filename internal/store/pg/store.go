@@ -3,6 +3,11 @@ package pg
 import (
 	"fmt"
 
+	"github.com/mr1cloud/Avito-Reviewer/internal/repository/teams"
+	pgteams "github.com/mr1cloud/Avito-Reviewer/internal/repository/teams/pg"
+	"github.com/mr1cloud/Avito-Reviewer/internal/repository/users"
+	pgusers "github.com/mr1cloud/Avito-Reviewer/internal/repository/users/pg"
+
 	"github.com/mr1cloud/Avito-Reviewer/internal/logger"
 	"github.com/mr1cloud/Avito-Reviewer/internal/store"
 
@@ -13,6 +18,17 @@ import (
 type pgStore struct {
 	db     *sqlx.DB
 	logger *logger.Logger
+
+	usersRepository *pgusers.UsersRepository
+	teamsRepository *pgteams.TeamsRepository
+}
+
+func (s *pgStore) UsersRepository() users.UsersRepository {
+	return s.usersRepository
+}
+
+func (s *pgStore) TeamsRepository() teams.TeamsRepository {
+	return s.teamsRepository
 }
 
 func (s *pgStore) Close() error {
@@ -41,5 +57,15 @@ func NewStore(logger *logger.Logger, cfg Config) (store.Store, error) {
 	return &pgStore{
 		db:     db,
 		logger: log,
+
+		usersRepository: &pgusers.UsersRepository{
+			DB:     db,
+			Logger: log.WithFields("repository", "users"),
+		},
+
+		teamsRepository: &pgteams.TeamsRepository{
+			DB:     db,
+			Logger: log.WithFields("repository", "teams"),
+		},
 	}, nil
 }

@@ -13,3 +13,12 @@ goose:
 
 run:
 	docker compose up -d
+
+gen-docs:
+	go tool swag init -g internal/controller/rest/server.go -o docs/swagger --v3.1 --generatedTime
+	mv docs/swagger/swagger.yaml docs/swagger/openapi.yaml
+	mv docs/swagger/swagger.json docs/swagger/openapi.json
+	sed -i 's|swag/v2|swag|' docs/swagger/docs.go
+	sed -i 's|3.1.0|3.0.1|' docs/swagger/docs.go
+	sed -i 's|3.1.0|3.0.1|' docs/swagger/openapi.yaml
+	sed -i 's|3.1.0|3.0.1|' docs/swagger/openapi.json

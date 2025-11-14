@@ -14,8 +14,8 @@ func init() {
 type PrStatus string
 
 const (
-	PrStatusOpen   PrStatus = "open"
-	PrStatusMerged PrStatus = "merged"
+	PrStatusOpen   PrStatus = "OPEN"
+	PrStatusMerged PrStatus = "MERGED"
 )
 
 func (pr PrStatus) IsValid() bool {

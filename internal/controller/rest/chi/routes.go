@@ -9,16 +9,33 @@ import (
 	"github.com/MarceloPetrucio/go-scalar-api-reference"
 	"github.com/go-chi/chi/v5"
 	chimiddleware "github.com/go-chi/chi/v5/middleware"
+	"github.com/go-chi/cors"
 )
 
 func (s *server) initRoutes() {
 	r := chi.NewRouter()
 
+	r.Use(cors.Handler(cors.Options{
+		AllowedOrigins: s.cfg.AllowOrigins,
+		AllowedMethods: []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowedHeaders: []string{"Accept", "Authorization", "Content-Type"},
+		ExposedHeaders: []string{"Link"},
+	}))
 	r.Use(middleware.LoggerMiddleware(s.logger))
 	r.Use(chimiddleware.Recoverer)
 
 	r.Route(s.cfg.BasePath, func(r chi.Router) {
+		// Teams routes
+		r.Route("/team", func(r chi.Router) {
+			r.Post("/add", s.teamsHandlers.PostAddTeam())
+			r.Put("/update", s.teamsHandlers.PutUpdateTeam())
+			r.Get("/get", s.teamsHandlers.GetTeam())
+		})
 
+		// Users routes
+		r.Route("/users", func(r chi.Router) {
+			r.Post("/setIsActive", s.usersHandlers.PostSetUserIsActive())
+		})
 	})
 
 	if s.cfg.DocsEnabled {

@@ -10,6 +10,11 @@ import (
 	"github.com/mr1cloud/Avito-Reviewer/internal/controller/rest"
 	"github.com/mr1cloud/Avito-Reviewer/internal/logger"
 
+	"github.com/mr1cloud/Avito-Reviewer/internal/controller/rest/chi/teams"
+	"github.com/mr1cloud/Avito-Reviewer/internal/controller/rest/chi/users"
+	"github.com/mr1cloud/Avito-Reviewer/internal/service/team"
+	"github.com/mr1cloud/Avito-Reviewer/internal/service/user"
+
 	_ "github.com/mr1cloud/Avito-Reviewer/docs/swagger"
 
 	"github.com/swaggo/swag"
@@ -21,9 +26,15 @@ type server struct {
 	cfg         Config
 
 	logger *logger.Logger
+
+	users user.User
+	teams team.Team
+
+	usersHandlers *users.Handlers
+	teamsHandlers *teams.Handlers
 }
 
-func NewServer(logger *logger.Logger, cfg Config) rest.Server {
+func NewServer(logger *logger.Logger, cfg Config, userService user.User, teamService team.Team) rest.Server {
 	var s server
 
 	// set config
@@ -31,6 +42,14 @@ func NewServer(logger *logger.Logger, cfg Config) rest.Server {
 
 	// set logger
 	s.logger = logger.WithFields("layer", "rest")
+
+	// set services
+	s.users = userService
+	s.teams = teamService
+
+	// init handlers
+	s.usersHandlers = users.NewUsersHandler(s.users)
+	s.teamsHandlers = teams.NewTeamsHandler(s.teams)
 
 	// create http server
 	s.app = &http.Server{
