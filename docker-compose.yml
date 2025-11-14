@@ -1,0 +1,17 @@
+services:
+  database:
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: ${STORE_USER:-user}
+      POSTGRES_PASSWORD: ${STORE_PASSWORD:-password}
+      POSTGRES_DB: ${STORE_DATABASE:-database}
+    env_file:
+      - .env
+    volumes:
+      - database_data:/var/lib/postgresql
+    ports:
+      - "45432:5432"
+
+volumes:
+  database_data:
+    name: database_data
