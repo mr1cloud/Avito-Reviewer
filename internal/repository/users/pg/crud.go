@@ -17,7 +17,7 @@ type UsersRepository struct {
 	Logger *logger.Logger
 }
 
-func (u *UsersRepository) GetUserById(ctx context.Context, userId string) (*model.User, error) {
+func (u *UsersRepository) SelectUserById(ctx context.Context, userId string) (*model.User, error) {
 	var user model.User
 
 	query := `SELECT * FROM users WHERE user_id = $1`

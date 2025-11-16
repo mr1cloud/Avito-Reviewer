@@ -18,7 +18,7 @@ type service struct {
 }
 
 func (s *service) GetUserById(ctx context.Context, userId string) (*model.User, error) {
-	user, err := s.usersRepository.GetUserById(ctx, userId)
+	user, err := s.usersRepository.SelectUserById(ctx, userId)
 	if err != nil {
 		switch {
 		case errors.Is(err, repository.ErrNotFound):
@@ -43,9 +43,9 @@ func (s *service) UpdateUserIsActiveById(ctx context.Context, userId string, isA
 	return user, nil
 }
 
-func NewService(logger *logger.Logger, usersRepo users.UsersRepository) User {
+func NewService(logger *logger.Logger, usersRepository users.UsersRepository) User {
 	return &service{
-		usersRepository: usersRepo,
+		usersRepository: usersRepository,
 		logger:          logger,
 	}
 }

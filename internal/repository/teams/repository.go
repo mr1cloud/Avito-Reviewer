@@ -10,10 +10,10 @@ import (
 //
 //goland:noinspection GoNameStartsWithPackageName
 type TeamsRepository interface {
-	// CreateTeam creates a new team with the given name and members
-	CreateTeam(ctx context.Context, teamName string, members model.TeamMembers) error
+	// InsertTeam inserts a new team with the given name and members
+	InsertTeam(ctx context.Context, teamName string, members model.TeamMembers) error
 	// UpdateTeam updates the members of an existing team
 	UpdateTeam(ctx context.Context, teamName string, oldMembers model.TeamMembers, newMembers model.TeamMembers) error
-	// GetTeam retrieves a team by its name
-	GetTeam(ctx context.Context, teamName string) (*model.Team, error)
+	// SelectTeam retrieves a team by its name
+	SelectTeam(ctx context.Context, teamName string) (*model.Team, error)
 }

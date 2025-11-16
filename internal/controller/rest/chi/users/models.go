@@ -10,3 +10,8 @@ type SetUserIsActiveRequest struct {
 type UserResponse struct {
 	User model.User `json:"user"`
 }
+
+type PullRequestsAssignedToUserResponse struct {
+	UserID       string                   `json:"user_id"`
+	PullRequests []model.PullRequestShort `json:"pull_requests"`
+}

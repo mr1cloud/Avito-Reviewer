@@ -11,6 +11,7 @@ import (
 	"github.com/mr1cloud/Avito-Reviewer/internal/controller/rest"
 	"github.com/mr1cloud/Avito-Reviewer/internal/controller/rest/chi"
 	"github.com/mr1cloud/Avito-Reviewer/internal/logger"
+	"github.com/mr1cloud/Avito-Reviewer/internal/service/pull-request"
 	"github.com/mr1cloud/Avito-Reviewer/internal/service/team"
 	"github.com/mr1cloud/Avito-Reviewer/internal/service/user"
 	"github.com/mr1cloud/Avito-Reviewer/internal/store"
@@ -29,8 +30,9 @@ type app struct {
 	restServer rest.Server
 	store      store.Store
 
-	users user.User
-	teams team.Team
+	users        user.User
+	teams        team.Team
+	pullRequests pull_request.PullRequest
 }
 
 // NewApp creates new instance of App
@@ -47,11 +49,12 @@ func NewApp(logger *logger.Logger, cfg config.Config) App {
 	a.store = store
 
 	// creating services
-	a.users = user.NewService(logger.WithFields("layer", "service_users"), a.store.UsersRepository())
-	a.teams = team.NewService(logger.WithFields("layer", "service_teams"), a.store.TeamsRepository())
+	a.users = user.NewService(logger.WithFields("layer", "service-users"), a.store.UsersRepository())
+	a.teams = team.NewService(logger.WithFields("layer", "service-teams"), a.store.TeamsRepository())
+	a.pullRequests = pull_request.NewService(logger.WithFields("layer", "service-pull-requests"), a.store.PullRequestsRepository(), a.users, a.teams)
 
 	// creating rest server
-	a.restServer = chi.NewServer(logger.WithFields("layer", "rest"), cfg.Rest, a.users, a.teams)
+	a.restServer = chi.NewServer(logger.WithFields("layer", "rest"), cfg.Rest, a.users, a.teams, a.pullRequests)
 
 	return &a
 }

@@ -35,6 +35,7 @@ func (s *server) initRoutes() {
 		// Users routes
 		r.Route("/users", func(r chi.Router) {
 			r.Post("/setIsActive", s.usersHandlers.PostSetUserIsActive())
+			r.Get("/getReview", s.usersHandlers.GetPullRequestsAssignedToUser())
 		})
 	})
 

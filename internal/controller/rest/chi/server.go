@@ -12,6 +12,8 @@ import (
 
 	"github.com/mr1cloud/Avito-Reviewer/internal/controller/rest/chi/teams"
 	"github.com/mr1cloud/Avito-Reviewer/internal/controller/rest/chi/users"
+
+	"github.com/mr1cloud/Avito-Reviewer/internal/service/pull-request"
 	"github.com/mr1cloud/Avito-Reviewer/internal/service/team"
 	"github.com/mr1cloud/Avito-Reviewer/internal/service/user"
 
@@ -27,14 +29,15 @@ type server struct {
 
 	logger *logger.Logger
 
-	users user.User
-	teams team.Team
+	users        user.User
+	teams        team.Team
+	pullRequests pull_request.PullRequest
 
 	usersHandlers *users.Handlers
 	teamsHandlers *teams.Handlers
 }
 
-func NewServer(logger *logger.Logger, cfg Config, userService user.User, teamService team.Team) rest.Server {
+func NewServer(logger *logger.Logger, cfg Config, userService user.User, teamService team.Team, pullRequestService pull_request.PullRequest) rest.Server {
 	var s server
 
 	// set config
@@ -46,9 +49,10 @@ func NewServer(logger *logger.Logger, cfg Config, userService user.User, teamSer
 	// set services
 	s.users = userService
 	s.teams = teamService
+	s.pullRequests = pullRequestService
 
 	// init handlers
-	s.usersHandlers = users.NewUsersHandler(s.users)
+	s.usersHandlers = users.NewUsersHandler(s.users, s.pullRequests)
 	s.teamsHandlers = teams.NewTeamsHandler(s.teams)
 
 	// create http server

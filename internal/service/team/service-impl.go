@@ -18,7 +18,7 @@ type service struct {
 }
 
 func (s *service) CreateTeam(ctx context.Context, teamName string, members model.TeamMembers) (*model.Team, error) {
-	err := s.teamsRepository.CreateTeam(ctx, teamName, members)
+	err := s.teamsRepository.InsertTeam(ctx, teamName, members)
 	if err != nil {
 		switch {
 		case errors.Is(err, repository.ErrConflict):
@@ -51,7 +51,7 @@ func (s *service) UpdateTeam(ctx context.Context, teamName string, members model
 }
 
 func (s *service) GetTeam(ctx context.Context, teamName string) (*model.Team, error) {
-	team, err := s.teamsRepository.GetTeam(ctx, teamName)
+	team, err := s.teamsRepository.SelectTeam(ctx, teamName)
 	if err != nil {
 		switch {
 		case errors.Is(err, repository.ErrNotFound):

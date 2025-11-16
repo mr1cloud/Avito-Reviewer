@@ -1,5 +1,7 @@
 package error
 
+import "net/http"
+
 type ServiceError interface {
 	error
 	ErrorStatusCode() int
@@ -10,7 +12,7 @@ type ServiceError interface {
 type notFoundError struct{}
 
 // ErrorStatusCode returns the HTTP status code for the error.
-func (e *notFoundError) ErrorStatusCode() int { return 404 }
+func (e *notFoundError) ErrorStatusCode() int { return http.StatusNotFound }
 
 // Code returns the error code.
 func (e *notFoundError) Code() string { return "NOT_FOUND" }

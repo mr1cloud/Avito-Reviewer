@@ -3,6 +3,7 @@ package model
 import (
 	"encoding/json"
 	"fmt"
+	"slices"
 )
 
 type TeamMember struct {
@@ -36,6 +37,23 @@ func (tm *TeamMembers) Contains(userID string) bool {
 		}
 	}
 	return false
+}
+
+func (tm *TeamMembers) GetMembersCount() int {
+	return len(*tm)
+}
+
+func (tm *TeamMembers) GetActiveMembers(maxCount int, excludeIds ...string) TeamMembers {
+	activeMembers := make(TeamMembers, maxCount)
+	for _, member := range *tm {
+		if member.IsActive && !slices.Contains(excludeIds, member.UserID) {
+			activeMembers = append(activeMembers, member)
+			if len(activeMembers) >= maxCount {
+				break
+			}
+		}
+	}
+	return activeMembers
 }
 
 type Team struct {

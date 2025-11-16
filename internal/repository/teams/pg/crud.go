@@ -18,7 +18,7 @@ type TeamsRepository struct {
 	Logger *logger.Logger
 }
 
-func (t *TeamsRepository) CreateTeam(ctx context.Context, teamName string, members model.TeamMembers) error {
+func (t *TeamsRepository) InsertTeam(ctx context.Context, teamName string, members model.TeamMembers) error {
 	tx, err := t.DB.BeginTx(ctx, nil)
 	if err != nil {
 		t.Logger.Errorf("error starting create team transaction: %v", err)
@@ -34,7 +34,7 @@ func (t *TeamsRepository) CreateTeam(ctx context.Context, teamName string, membe
 	}()
 
 	query := `INSERT INTO teams (team_name) VALUES ($1);`
-	_, err = tx.QueryContext(ctx, query, teamName)
+	_, err = tx.ExecContext(ctx, query, teamName)
 	if err != nil {
 		var pgErr *pgconn.PgError
 		if errors.As(err, &pgErr) {
@@ -48,7 +48,7 @@ func (t *TeamsRepository) CreateTeam(ctx context.Context, teamName string, membe
 
 	query = `INSERT INTO users (user_id, username, is_active, team_name) VALUES ($1, $2, $3, $4);`
 	for _, member := range members {
-		_, err = tx.QueryContext(ctx, query, member.UserID, member.Username, member.IsActive, teamName)
+		_, err = tx.ExecContext(ctx, query, member.UserID, member.Username, member.IsActive, teamName)
 		if err != nil {
 			var pgErr *pgconn.PgError
 			if errors.As(err, &pgErr) {
@@ -88,7 +88,7 @@ func (t *TeamsRepository) UpdateTeam(ctx context.Context, teamName string, oldMe
 	query := `DELETE FROM users WHERE user_id = $1 AND team_name = $2;`
 	for _, oldMember := range oldMembers {
 		if !newMembers.Contains(oldMember.UserID) {
-			_, err = tx.QueryContext(ctx, query, oldMember.UserID, teamName)
+			_, err = tx.ExecContext(ctx, query, oldMember.UserID, teamName)
 			if err != nil {
 				if errors.Is(err, sql.ErrNoRows) {
 					continue
@@ -102,7 +102,7 @@ func (t *TeamsRepository) UpdateTeam(ctx context.Context, teamName string, oldMe
 	query = `INSERT INTO users (user_id, username, is_active, team_name) VALUES ($1, $2, $3, $4);`
 	for _, newMember := range newMembers {
 		if !oldMembers.Contains(newMember.UserID) {
-			_, err = tx.QueryContext(ctx, query, newMember.UserID, newMember.Username, newMember.IsActive, teamName)
+			_, err = tx.ExecContext(ctx, query, newMember.UserID, newMember.Username, newMember.IsActive, teamName)
 			if err != nil {
 				var pgErr *pgconn.PgError
 				if errors.As(err, &pgErr) {
@@ -125,7 +125,7 @@ func (t *TeamsRepository) UpdateTeam(ctx context.Context, teamName string, oldMe
 	return nil
 }
 
-func (t *TeamsRepository) GetTeam(ctx context.Context, teamName string) (*model.Team, error) {
+func (t *TeamsRepository) SelectTeam(ctx context.Context, teamName string) (*model.Team, error) {
 	var team model.Team
 
 	query := `

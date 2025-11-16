@@ -28,7 +28,7 @@ func NewTeamsHandler(teams team.Team) *Handlers {
 
 // PostAddTeam godoc
 //
-//	@Summary		Add Team
+//	@Summary		Add team
 //	@Description	Create a new team
 //	@Tags			Teams
 //
@@ -65,7 +65,7 @@ func (h *Handlers) PostAddTeam() http.HandlerFunc {
 
 // PutUpdateTeam godoc
 //
-//	@Summary		Update Team
+//	@Summary		Update team
 //	@Description	Update an existing team
 //	@Tags			Teams
 //
@@ -102,7 +102,7 @@ func (h *Handlers) PutUpdateTeam() http.HandlerFunc {
 
 // GetTeam godoc
 //
-//	@Summary		Get Team
+//	@Summary		Get team
 //	@Description	Retrieve a team by name
 //	@Tags			Teams
 //
