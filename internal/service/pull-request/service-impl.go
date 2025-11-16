@@ -120,6 +120,14 @@ func (s *service) ReassignPullRequestReviewers(ctx context.Context, pullRequestI
 	}
 
 	err = s.pullRequestsRepository.UpdatePullRequestAssignedReviewers(ctx, pullRequestId, oldReviewerId, newAssignedReviewers[0])
+	if err != nil {
+		switch {
+		case errors.Is(err, repository.ErrConflict):
+			return nil, nil, NewPullRequestAlreadyExistsError(pullRequestId)
+		default:
+			return nil, nil, err
+		}
+	}
 
 	pullRequest, err = s.GetPullRequest(ctx, pullRequestId)
 	if err != nil {

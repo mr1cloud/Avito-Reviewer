@@ -6,6 +6,7 @@ import (
 
 	"github.com/mr1cloud/Avito-Reviewer/internal/controller/rest/tools"
 	"github.com/mr1cloud/Avito-Reviewer/internal/service/pull-request"
+	"github.com/mr1cloud/Avito-Reviewer/internal/validation"
 
 	serviceerrors "github.com/mr1cloud/Avito-Reviewer/internal/error"
 
@@ -48,6 +49,12 @@ func (h *Handlers) PostCreatePullRequest() http.HandlerFunc {
 			return
 		}
 
+		err := validation.Validate.Struct(req)
+		if err != nil {
+			tools.RespondWithError(w, http.StatusBadRequest, "USER_FATAL", err.Error())
+			return
+		}
+
 		pullRequest, err := h.PullRequests.CreatePullRequest(r.Context(), req.PullRequestID, req.PullRequestName, req.AuthorID)
 		if err != nil {
 			var srvErr serviceerrors.ServiceError
@@ -87,6 +94,12 @@ func (h *Handlers) PostMergePullRequest() http.HandlerFunc {
 			return
 		}
 
+		err := validation.Validate.Struct(req)
+		if err != nil {
+			tools.RespondWithError(w, http.StatusBadRequest, "USER_FATAL", err.Error())
+			return
+		}
+
 		pullRequest, err := h.PullRequests.MergePullRequest(r.Context(), req.PullRequestID)
 		if err != nil {
 			var srvErr serviceerrors.ServiceError
@@ -122,6 +135,12 @@ func (h *Handlers) PostReassignReviewerPullRequest() http.HandlerFunc {
 		var req ReassignReviewerPrRequest
 		if err := tools.DecodeJSON(r, &req); err != nil {
 			tools.RespondWithError(w, err.(serviceerrors.ServiceError).ErrorStatusCode(), "USER_FATAL", err.Error())
+			return
+		}
+
+		err := validation.Validate.Struct(req)
+		if err != nil {
+			tools.RespondWithError(w, http.StatusBadRequest, "USER_FATAL", err.Error())
 			return
 		}
 

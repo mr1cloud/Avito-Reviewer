@@ -7,6 +7,7 @@ import (
 	"github.com/mr1cloud/Avito-Reviewer/internal/controller/rest/tools"
 	"github.com/mr1cloud/Avito-Reviewer/internal/service/pull-request"
 	"github.com/mr1cloud/Avito-Reviewer/internal/service/user"
+	"github.com/mr1cloud/Avito-Reviewer/internal/validation"
 
 	serviceerrors "github.com/mr1cloud/Avito-Reviewer/internal/error"
 
@@ -52,6 +53,12 @@ func (h *Handlers) PostSetUserIsActive() http.HandlerFunc {
 			return
 		}
 
+		err := validation.Validate.Struct(req)
+		if err != nil {
+			tools.RespondWithError(w, http.StatusBadRequest, "USER_FATAL", err.Error())
+			return
+		}
+
 		user, err := h.Users.UpdateUserIsActiveById(r.Context(), req.UserID, req.IsActive)
 		if err != nil {
 			var srvErr serviceerrors.ServiceError
@@ -63,7 +70,9 @@ func (h *Handlers) PostSetUserIsActive() http.HandlerFunc {
 			return
 		}
 
-		tools.RespondJSON(w, http.StatusOK, user)
+		tools.RespondJSON(w, http.StatusOK, UserResponse{
+			User: *user,
+		})
 	}
 }
 

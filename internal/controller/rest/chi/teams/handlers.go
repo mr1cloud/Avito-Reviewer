@@ -6,6 +6,7 @@ import (
 
 	"github.com/mr1cloud/Avito-Reviewer/internal/controller/rest/tools"
 	"github.com/mr1cloud/Avito-Reviewer/internal/service/team"
+	"github.com/mr1cloud/Avito-Reviewer/internal/validation"
 
 	serviceerrors "github.com/mr1cloud/Avito-Reviewer/internal/error"
 
@@ -48,6 +49,12 @@ func (h *Handlers) PostAddTeam() http.HandlerFunc {
 			return
 		}
 
+		err := validation.Validate.Struct(req)
+		if err != nil {
+			tools.RespondWithError(w, http.StatusBadRequest, "USER_FATAL", err.Error())
+			return
+		}
+
 		team, err := h.Teams.CreateTeam(r.Context(), req.TeamName, req.Members)
 		if err != nil {
 			var srvErr serviceerrors.ServiceError
@@ -82,6 +89,12 @@ func (h *Handlers) PutUpdateTeam() http.HandlerFunc {
 		var req CreateUpdateTeamRequest
 		if err := tools.DecodeJSON(r, &req); err != nil {
 			tools.RespondWithError(w, http.StatusBadRequest, "USER_FATAL", "Check your request body")
+			return
+		}
+
+		err := validation.Validate.Struct(req)
+		if err != nil {
+			tools.RespondWithError(w, http.StatusBadRequest, "USER_FATAL", err.Error())
 			return
 		}
 

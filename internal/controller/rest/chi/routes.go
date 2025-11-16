@@ -1,7 +1,6 @@
 package chi
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/mr1cloud/Avito-Reviewer/internal/controller/rest/middleware"
@@ -60,7 +59,7 @@ func (s *server) initRoutes() {
 			}
 
 			w.Header().Set("Content-Type", "text/html")
-			_, err = w.Write([]byte(fmt.Sprintf("%s", htmlContent)))
+			_, err = w.Write([]byte(htmlContent))
 			if err != nil {
 				s.logger.Errorf("failed to write swagger docs response: %v", err)
 			}
