@@ -72,7 +72,7 @@ func (s *service) MergePullRequest(ctx context.Context, pullRequestId string) (*
 	}
 
 	if pullRequest.Status == model.PrStatusMerged {
-		return nil, NewPullRequestsAlreadyMergedError()
+		return pullRequest, nil
 	}
 
 	err = s.pullRequestsRepository.UpdatePullRequestStatus(ctx, pullRequestId, "MERGED")
