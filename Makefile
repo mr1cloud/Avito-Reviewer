@@ -12,7 +12,7 @@ goose:
 	go tool goose -dir migrations/ postgres $(PG_DSN) $(ARGS)
 
 run:
-	docker compose up -d
+	go run ./cmd/server/main.go
 
 gen-docs:
 	go tool swag fmt
@@ -29,3 +29,6 @@ up:
 
 down:
 	docker compose down
+
+golangci-lint:
+	go tool golangci-lint run --config ./.golangci.yml ./...
