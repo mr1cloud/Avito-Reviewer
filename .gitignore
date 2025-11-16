@@ -28,3 +28,7 @@ go.work.sum
 # IDEs and editors
 .vscode/
 .idea/
+
+# logs folder and files
+logs/
+*.log
