@@ -44,7 +44,7 @@ func (tm *TeamMembers) GetMembersCount() int {
 }
 
 func (tm *TeamMembers) GetActiveMembers(maxCount int, excludeIds ...string) TeamMembers {
-	activeMembers := make(TeamMembers, maxCount)
+	activeMembers := make(TeamMembers, 0, maxCount)
 	for _, member := range *tm {
 		if member.IsActive && !slices.Contains(excludeIds, member.UserID) {
 			activeMembers = append(activeMembers, member)

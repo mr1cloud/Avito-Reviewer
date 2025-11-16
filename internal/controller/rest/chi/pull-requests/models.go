@@ -1,4 +1,4 @@
-package pull_request
+package pull_requests
 
 import "github.com/mr1cloud/Avito-Reviewer/internal/model"
 

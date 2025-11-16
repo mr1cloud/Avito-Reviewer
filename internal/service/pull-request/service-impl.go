@@ -34,7 +34,7 @@ func (s *service) CreatePullRequest(ctx context.Context, pullRequestId, pullRequ
 
 	assignedReviewers := team.Members.GetActiveMembers(2, authorId)
 	if len(assignedReviewers) == 0 {
-		return nil, NewNoCandidateReviewersError()
+		return nil, serviceerrors.NewNotFoundError()
 	}
 
 	err = s.pullRequestsRepository.InsertPullRequest(ctx, pullRequestId, pullRequestName, authorId, assignedReviewers)

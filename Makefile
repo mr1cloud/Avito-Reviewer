@@ -15,6 +15,7 @@ run:
 	docker compose up -d
 
 gen-docs:
+	go tool swag fmt
 	go tool swag init -g internal/controller/rest/server.go -o docs/swagger --v3.1 --generatedTime
 	mv docs/swagger/swagger.yaml docs/swagger/openapi.yaml
 	mv docs/swagger/swagger.json docs/swagger/openapi.json

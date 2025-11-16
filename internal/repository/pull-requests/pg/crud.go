@@ -33,7 +33,7 @@ func (p *PullRequestsRepository) InsertPullRequest(ctx context.Context, pullRequ
 		}
 	}()
 
-	query := `INSERT INTO pull_requests (pull_request_id, pull_request_name, author_id) VALUES ($1, $2, $3);`
+	query := `INSERT INTO pull_requests (pull_request_id, pull_request_name, author_id, status) VALUES ($1, $2, $3, 'OPEN');`
 	_, err = tx.ExecContext(ctx, query, pullRequestId, pullRequestName, authorId)
 	if err != nil {
 		var pgErr *pgconn.PgError
@@ -74,7 +74,7 @@ func (p *PullRequestsRepository) SelectPullRequestById(ctx context.Context, pull
 	var pr model.PullRequest
 
 	query := `
-	SELECT *,
+	SELECT pr.*,
 		   COALESCE(json_agg(ar.reviewer_id::text) FILTER (WHERE ar.reviewer_id IS NOT NULL),
 					'[]'::json) AS assigned_reviewers
 	FROM pull_requests pr

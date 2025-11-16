@@ -37,6 +37,11 @@ func (s *server) initRoutes() {
 			r.Post("/setIsActive", s.usersHandlers.PostSetUserIsActive())
 			r.Get("/getReview", s.usersHandlers.GetPullRequestsAssignedToUser())
 		})
+
+		// Pull requests routes
+		r.Route("/pullRequest", func(r chi.Router) {
+			r.Post("/create", s.pullRequestsHandlers.PostCreatePullRequest())
+		})
 	})
 
 	if s.cfg.DocsEnabled {

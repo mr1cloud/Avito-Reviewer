@@ -5,7 +5,6 @@ import (
 	"net/http"
 
 	"github.com/mr1cloud/Avito-Reviewer/internal/controller/rest/tools"
-
 	"github.com/mr1cloud/Avito-Reviewer/internal/service/pull-request"
 	"github.com/mr1cloud/Avito-Reviewer/internal/service/user"
 
