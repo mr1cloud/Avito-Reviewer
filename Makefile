@@ -32,3 +32,6 @@ down:
 
 golangci-lint:
 	go tool golangci-lint run --config ./.golangci.yml ./...
+
+k6-get-test:
+	k6 run ./loadtest/get-test.js
