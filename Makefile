@@ -23,3 +23,9 @@ gen-docs:
 	sed -i 's|3.1.0|3.0.1|' docs/swagger/docs.go
 	sed -i 's|3.1.0|3.0.1|' docs/swagger/openapi.yaml
 	sed -i 's|3.1.0|3.0.1|' docs/swagger/openapi.json
+
+up:
+	docker compose up -d
+
+down:
+	docker compose down
