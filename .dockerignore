@@ -1,0 +1,6 @@
+*.env
+*.log
+migrations
+.gitignore
+Makefile
+README.md
