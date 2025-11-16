@@ -8,6 +8,16 @@ type CreatePrRequest struct {
 	AuthorID        string `json:"author_id" validate:"required"`
 }
 
+type MergePrRequest struct {
+	PullRequestID string `json:"pull_request_id" validate:"required"`
+}
+
+type ReassignReviewerPrRequest struct {
+	PullRequestID string `json:"pull_request_id" validate:"required"`
+	OldReviewerID string `json:"old_reviewer_id" validate:"required"`
+}
+
 type PullRequestResponse struct {
 	PullRequest model.PullRequest `json:"pr"`
+	ReplacedBy  *string           `json:"replaced_by,omitempty"`
 }

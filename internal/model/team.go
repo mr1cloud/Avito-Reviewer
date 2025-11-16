@@ -3,7 +3,9 @@ package model
 import (
 	"encoding/json"
 	"fmt"
+	"math/rand"
 	"slices"
+	"time"
 )
 
 type TeamMember struct {
@@ -44,16 +46,23 @@ func (tm *TeamMembers) GetMembersCount() int {
 }
 
 func (tm *TeamMembers) GetActiveMembers(maxCount int, excludeIds ...string) TeamMembers {
-	activeMembers := make(TeamMembers, 0, maxCount)
+	candidates := make(TeamMembers, 0)
 	for _, member := range *tm {
 		if member.IsActive && !slices.Contains(excludeIds, member.UserID) {
-			activeMembers = append(activeMembers, member)
-			if len(activeMembers) >= maxCount {
-				break
-			}
+			candidates = append(candidates, member)
 		}
 	}
-	return activeMembers
+	if maxCount <= 0 || len(candidates) == 0 {
+		return make(TeamMembers, 0)
+	}
+	rnd := rand.New(rand.NewSource(time.Now().UnixNano()))
+	rnd.Shuffle(len(candidates), func(i, j int) {
+		candidates[i], candidates[j] = candidates[j], candidates[i]
+	})
+	if len(candidates) > maxCount {
+		return candidates[:maxCount]
+	}
+	return candidates
 }
 
 type Team struct {

@@ -3,6 +3,7 @@ package pull_request
 import (
 	"context"
 	"errors"
+	"slices"
 
 	"github.com/mr1cloud/Avito-Reviewer/internal/logger"
 	"github.com/mr1cloud/Avito-Reviewer/internal/model"
@@ -40,7 +41,7 @@ func (s *service) CreatePullRequest(ctx context.Context, pullRequestId, pullRequ
 	err = s.pullRequestsRepository.InsertPullRequest(ctx, pullRequestId, pullRequestName, authorId, assignedReviewers)
 	if err != nil {
 		switch {
-		case errors.Is(err, repository.ErrAlreadyExists):
+		case errors.Is(err, repository.ErrConflict):
 			return nil, NewPullRequestAlreadyExistsError(pullRequestId)
 		default:
 			return nil, err
@@ -65,7 +66,67 @@ func (s *service) GetPullRequest(ctx context.Context, pullRequestId string) (*mo
 }
 
 func (s *service) MergePullRequest(ctx context.Context, pullRequestId string) (*model.PullRequest, error) {
-	return nil, nil
+	pullRequest, err := s.GetPullRequest(ctx, pullRequestId)
+	if err != nil {
+		return nil, err
+	}
+
+	if pullRequest.Status == model.PrStatusMerged {
+		return nil, NewPullRequestsAlreadyMergedError()
+	}
+
+	err = s.pullRequestsRepository.UpdatePullRequestStatus(ctx, pullRequestId, "MERGED")
+	if err != nil {
+		switch {
+		case errors.Is(err, repository.ErrNotFound):
+			return nil, serviceerrors.NewNotFoundError()
+		default:
+			return nil, err
+		}
+	}
+
+	return s.GetPullRequest(ctx, pullRequestId)
+}
+
+func (s *service) ReassignPullRequestReviewers(ctx context.Context, pullRequestId, oldReviewerId string) (*model.PullRequest, *string, error) {
+	pullRequest, err := s.GetPullRequest(ctx, pullRequestId)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	if pullRequest.AuthorID == oldReviewerId {
+		return nil, nil, serviceerrors.NewNotFoundError()
+	}
+
+	if !slices.Contains(pullRequest.AssignedReviewers.Strings(), oldReviewerId) {
+		return nil, nil, serviceerrors.NewNotFoundError()
+	}
+
+	oldUser, err := s.users.GetUserById(ctx, oldReviewerId)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	team, err := s.teams.GetTeam(ctx, oldUser.TeamName)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	excludeUsersIds := append(pullRequest.AssignedReviewers.Strings(), pullRequest.AuthorID)
+
+	newAssignedReviewers := team.Members.GetActiveMembers(1, excludeUsersIds...)
+	if len(newAssignedReviewers) == 0 {
+		return nil, nil, serviceerrors.NewNotFoundError()
+	}
+
+	err = s.pullRequestsRepository.UpdatePullRequestAssignedReviewers(ctx, pullRequestId, oldReviewerId, newAssignedReviewers[0])
+
+	pullRequest, err = s.GetPullRequest(ctx, pullRequestId)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	return pullRequest, &newAssignedReviewers[0].UserID, nil
 }
 
 func (s *service) GetPullRequestsAssignedToUser(ctx context.Context, userId string) ([]model.PullRequestShort, error) {

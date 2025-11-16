@@ -94,6 +94,61 @@ func (p *PullRequestsRepository) SelectPullRequestById(ctx context.Context, pull
 	return &pr, nil
 }
 
+func (p *PullRequestsRepository) UpdatePullRequestStatus(ctx context.Context, pullRequestId, status string) error {
+	query := `UPDATE pull_requests SET status = $1 WHERE pull_request_id = $2;`
+	_, err := p.DB.ExecContext(ctx, query, status, pullRequestId)
+	if err != nil {
+		p.Logger.Errorf("error updating pull request status: %v", err)
+		return err
+	}
+
+	return nil
+}
+
+func (p *PullRequestsRepository) UpdatePullRequestAssignedReviewers(ctx context.Context, pullRequestId string, oldAssignedReviewer string, newAssignedReviewers model.TeamMember) error {
+	tx, err := p.DB.BeginTx(ctx, nil)
+	if err != nil {
+		p.Logger.Errorf("error starting update pull request assigned reviewers transaction: %v", err)
+		return err
+	}
+	defer func() {
+		if err != nil {
+			if rollErr := tx.Rollback(); rollErr != nil {
+				p.Logger.Errorf("error rolling back update pull request assigned reviewers transaction: %v", rollErr)
+			}
+			return
+		}
+	}()
+
+	query := `DELETE FROM assigned_reviewers WHERE pull_request_id = $1 AND reviewer_id = $2;`
+	_, err = tx.ExecContext(ctx, query, pullRequestId, oldAssignedReviewer)
+	if err != nil {
+		p.Logger.Errorf("error deleting old assigned reviewer: %v", err)
+		return err
+	}
+
+	query = `INSERT INTO assigned_reviewers (pull_request_id, reviewer_id) VALUES ($1, $2);`
+	_, err = tx.ExecContext(ctx, query, pullRequestId, newAssignedReviewers.UserID)
+	if err != nil {
+		var pgErr *pgconn.PgError
+		if errors.As(err, &pgErr) {
+			if pgErr.Code == "23505" {
+				return repository.ErrConflict
+			}
+		}
+		p.Logger.Errorf("error inserting new assigned reviewer: %v", err)
+		return err
+	}
+
+	err = tx.Commit()
+	if err != nil {
+		p.Logger.Errorf("error committing update pull request assigned reviewers transaction: %v", err)
+		return err
+	}
+
+	return nil
+}
+
 func (p *PullRequestsRepository) SelectPullRequestsAssignedToUser(ctx context.Context, userId string) ([]model.PullRequestShort, error) {
 	var prs []model.PullRequestShort
 

@@ -26,8 +26,6 @@ components:
           uniqueItems: false
         author_id:
           type: string
-        created_at:
-          type: string
         merged_at:
           type: string
         pull_request_id:
@@ -103,10 +101,29 @@ components:
       - pull_request_id
       - pull_request_name
       type: object
+    pull_requests.MergePrRequest:
+      properties:
+        pull_request_id:
+          type: string
+      required:
+      - pull_request_id
+      type: object
     pull_requests.PullRequestResponse:
       properties:
         pr:
           $ref: '#/components/schemas/model.PullRequest'
+        replaced_by:
+          type: string
+      type: object
+    pull_requests.ReassignReviewerPrRequest:
+      properties:
+        old_reviewer_id:
+          type: string
+        pull_request_id:
+          type: string
+      required:
+      - old_reviewer_id
+      - pull_request_id
       type: object
     teams.CreateUpdateTeamRequest:
       properties:
@@ -181,6 +198,71 @@ paths:
                 $ref: '#/components/schemas/model.ErrorResponse'
           description: Internal Server Error
       summary: Create a new pull request
+      tags:
+      - PullRequests
+  /pullRequest/merge:
+    post:
+      description: Merges the pull request with the given ID.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/pull_requests.MergePrRequest'
+        description: Pull request merge data
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/pull_requests.PullRequestResponse'
+          description: OK
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/model.ErrorResponse'
+          description: Bad Request
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/model.ErrorResponse'
+          description: Internal Server Error
+      summary: Merge a pull request
+      tags:
+      - PullRequests
+  /pullRequest/reassign:
+    post:
+      description: Reassigns the specified reviewer for the given pull request to
+        a new reviewer.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/pull_requests.ReassignReviewerPrRequest'
+        description: Pull request reviewer reassignment data
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/pull_requests.PullRequestResponse'
+          description: OK
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/model.ErrorResponse'
+          description: Bad Request
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/model.ErrorResponse'
+          description: Internal Server Error
+      summary: Reassign a reviewer for a pull request
       tags:
       - PullRequests
   /team/add:

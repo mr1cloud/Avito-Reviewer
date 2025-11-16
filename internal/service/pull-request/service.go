@@ -16,6 +16,9 @@ type PullRequest interface {
 	// MergePullRequest merges the pull request with the given ID.
 	MergePullRequest(ctx context.Context, pullRequestId string) (*model.PullRequest, error)
 
+	// ReassignPullRequestReviewers reassigns reviewers for the pull request with the given ID, replacing oldReviewerId with new reviewers.
+	ReassignPullRequestReviewers(ctx context.Context, pullRequestId, oldReviewerId string) (*model.PullRequest, *string, error)
+
 	// GetPullRequestsAssignedToUser retrieves all pull requests assigned to the user with the given ID.
 	GetPullRequestsAssignedToUser(ctx context.Context, userId string) ([]model.PullRequestShort, error)
 }

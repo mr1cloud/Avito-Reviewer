@@ -39,7 +39,7 @@ type PullRequest struct {
 	AuthorID          string            `json:"author_id" db:"author_id"`
 	Status            PrStatus          `json:"status" db:"status"`
 	AssignedReviewers types.StringSlice `json:"assigned_reviewers" db:"assigned_reviewers"`
-	CreatedAt         time.Time         `json:"created_at" db:"created_at"`
+	CreatedAt         time.Time         `json:"-" db:"created_at"`
 	MergedAt          *time.Time        `json:"merged_at,omitempty" db:"merged_at"`
 }
 

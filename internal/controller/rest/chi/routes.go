@@ -41,6 +41,8 @@ func (s *server) initRoutes() {
 		// Pull requests routes
 		r.Route("/pullRequest", func(r chi.Router) {
 			r.Post("/create", s.pullRequestsHandlers.PostCreatePullRequest())
+			r.Post("/merge", s.pullRequestsHandlers.PostMergePullRequest())
+			r.Post("/reassign", s.pullRequestsHandlers.PostReassignReviewerPullRequest())
 		})
 	})
 

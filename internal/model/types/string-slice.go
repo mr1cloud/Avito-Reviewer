@@ -22,3 +22,10 @@ func (s *StringSlice) Scan(src interface{}) error {
 		return fmt.Errorf("cannot scan %T into StringSlice", src)
 	}
 }
+
+func (s *StringSlice) Strings() []string {
+	if s == nil {
+		return []string{}
+	}
+	return *s
+}
