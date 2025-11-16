@@ -1,6 +1,7 @@
 package model
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/mr1cloud/Avito-Reviewer/internal/model/types"
@@ -9,9 +10,10 @@ import (
 	"github.com/go-playground/validator/v10"
 )
 
-//goland:noinspection GoUnhandledErrorResult
 func init() {
-	validation.Validate.RegisterValidation("pr_status", ValidatePrStatus)
+	if err := validation.Validate.RegisterValidation("pr_status", ValidatePrStatus); err != nil {
+		panic(fmt.Sprintf("failed to register validation: %v", err))
+	}
 }
 
 type PrStatus string

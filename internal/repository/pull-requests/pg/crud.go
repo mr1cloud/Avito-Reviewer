@@ -204,7 +204,11 @@ func (p *PullRequestsRepository) GetPullRequestsStats(ctx context.Context, teamN
 		p.Logger.Errorf("error getting pull requests stats: %v", err)
 		return nil, err
 	}
-	defer rows.Close()
+	defer func() {
+		if err := rows.Close(); err != nil {
+			p.Logger.Error("failed to close rows: ", err)
+		}
+	}()
 
 	for rows.Next() {
 		var status string
