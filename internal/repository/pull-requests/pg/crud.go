@@ -174,18 +174,32 @@ func (p *PullRequestsRepository) SelectPullRequestsAssignedToUser(ctx context.Co
 	return prs, nil
 }
 
-func (p *PullRequestsRepository) GetPullRequestsStats(ctx context.Context) (map[string]int, error) {
+func (p *PullRequestsRepository) GetPullRequestsStats(ctx context.Context, teamName string) (map[string]int, error) {
 	stats := map[string]int{
 		"OPEN":   0,
 		"MERGED": 0,
 	}
 
-	query := `
-	SELECT status, COUNT(*) AS count
-	FROM pull_requests
-	GROUP BY status;
-	`
-	rows, err := p.DB.QueryContext(ctx, query)
+	var query string
+	var args []interface{}
+
+	if teamName != "" {
+		query = `
+		SELECT status, COUNT(*) AS count
+		FROM pull_requests
+		WHERE author_id IN (SELECT user_id FROM users WHERE team_name = $1)
+		GROUP BY status;
+		`
+		args = append(args, teamName)
+	} else {
+		query = `
+		SELECT status, COUNT(*) AS count
+		FROM pull_requests
+		GROUP BY status;
+		`
+	}
+
+	rows, err := p.DB.QueryContext(ctx, query, args...)
 	if err != nil {
 		p.Logger.Errorf("error getting pull requests stats: %v", err)
 		return nil, err

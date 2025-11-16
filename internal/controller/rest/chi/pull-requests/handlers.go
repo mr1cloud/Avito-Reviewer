@@ -31,12 +31,14 @@ func NewPullRequestsHandler(pullRequests pull_request.PullRequest) *Handlers {
 //	@Summary		Create a new pull request
 //	@Description	Creates a new pull request with the given ID, name, and author ID.
 //	@Tags			PullRequests
+//
 //	@Accept			json
 //	@Produce		json
 //	@Param			request	body		CreatePrRequest	true	"Pull request creation data"
 //	@Success		201		{object}	PullRequestResponse
 //	@Failure		400		{object}	model.ErrorResponse
 //	@Failure		500		{object}	model.ErrorResponse
+//
 //	@Router			/pullRequest/create [post]
 func (h *Handlers) PostCreatePullRequest() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -68,12 +70,14 @@ func (h *Handlers) PostCreatePullRequest() http.HandlerFunc {
 //	@Summary		Merge a pull request
 //	@Description	Merges the pull request with the given ID.
 //	@Tags			PullRequests
+//
 //	@Accept			json
 //	@Produce		json
 //	@Param			request	body		MergePrRequest	true	"Pull request merge data"
 //	@Success		200		{object}	PullRequestResponse
 //	@Failure		400		{object}	model.ErrorResponse
 //	@Failure		500		{object}	model.ErrorResponse
+//
 //	@Router			/pullRequest/merge [post]
 func (h *Handlers) PostMergePullRequest() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -111,6 +115,7 @@ func (h *Handlers) PostMergePullRequest() http.HandlerFunc {
 //	@Success		200		{object}	PullRequestResponse
 //	@Failure		400		{object}	model.ErrorResponse
 //	@Failure		500		{object}	model.ErrorResponse
+//
 //	@Router			/pullRequest/reassign [post]
 func (h *Handlers) PostReassignReviewerPullRequest() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -143,13 +148,23 @@ func (h *Handlers) PostReassignReviewerPullRequest() http.HandlerFunc {
 //	@Summary		Get pull requests statistics
 //	@Description	Retrieves statistics about pull requests.
 //	@Tags			PullRequests
+//
 //	@Produce		json
-//	@Success		200	{object}	PullRequestsStatsResponse
-//	@Failure		500	{object}	model.ErrorResponse
+//	@Param			team_name	query		string	false	"Team name to filter statistics"
+//	@Success		200			{object}	PullRequestsStatsResponse
+//	@Failure		404			{object}	model.ErrorResponse
+//	@Failure		500			{object}	model.ErrorResponse
+//
 //	@Router			/pullRequest/stats [get]
 func (h *Handlers) GetPullRequestsStats() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		stats, err := h.PullRequests.GetPullRequestsStats(r.Context())
+		teamName, err := tools.GetStringQueryParam(r, "team_name", false)
+		if err != nil {
+			tools.RespondWithError(w, err.(serviceerrors.ServiceError).ErrorStatusCode(), "USER_FATAL", err.Error())
+			return
+		}
+
+		stats, err := h.PullRequests.GetPullRequestsStats(r.Context(), teamName)
 		if err != nil {
 			var srvErr serviceerrors.ServiceError
 			if errors.As(err, &srvErr) {

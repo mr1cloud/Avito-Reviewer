@@ -148,8 +148,15 @@ func (s *service) GetPullRequestsAssignedToUser(ctx context.Context, userId stri
 	return pullRequests, nil
 }
 
-func (s *service) GetPullRequestsStats(ctx context.Context) (map[string]int, error) {
-	return s.pullRequestsRepository.GetPullRequestsStats(ctx)
+func (s *service) GetPullRequestsStats(ctx context.Context, teamName string) (map[string]int, error) {
+	if teamName != "" {
+		_, err := s.teams.GetTeam(ctx, teamName)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return s.pullRequestsRepository.GetPullRequestsStats(ctx, teamName)
 }
 
 func NewService(logger *logger.Logger, pullRequestsRepository pull_requests.PullRequestsRepository, users user.User, teams team.Team) PullRequest {

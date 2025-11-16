@@ -275,6 +275,12 @@ paths:
   /pullRequest/stats:
     get:
       description: Retrieves statistics about pull requests.
+      parameters:
+      - description: Team name to filter statistics
+        in: query
+        name: team_name
+        schema:
+          type: string
       responses:
         "200":
           content:
@@ -282,6 +288,12 @@ paths:
               schema:
                 $ref: '#/components/schemas/pull_requests.PullRequestsStatsResponse'
           description: OK
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/model.ErrorResponse'
+          description: Not Found
         "500":
           content:
             application/json:
