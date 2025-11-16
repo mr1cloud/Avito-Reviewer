@@ -148,6 +148,10 @@ func (s *service) GetPullRequestsAssignedToUser(ctx context.Context, userId stri
 	return pullRequests, nil
 }
 
+func (s *service) GetPullRequestsStats(ctx context.Context) (map[string]int, error) {
+	return s.pullRequestsRepository.GetPullRequestsStats(ctx)
+}
+
 func NewService(logger *logger.Logger, pullRequestsRepository pull_requests.PullRequestsRepository, users user.User, teams team.Team) PullRequest {
 	return &service{
 		pullRequestsRepository: pullRequestsRepository,

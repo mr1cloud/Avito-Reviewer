@@ -21,4 +21,7 @@ type PullRequest interface {
 
 	// GetPullRequestsAssignedToUser retrieves all pull requests assigned to the user with the given ID.
 	GetPullRequestsAssignedToUser(ctx context.Context, userId string) ([]model.PullRequestShort, error)
+
+	// GetPullRequestsStats retrieves statistics about pull requests.
+	GetPullRequestsStats(ctx context.Context) (map[string]int, error)
 }

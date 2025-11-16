@@ -43,6 +43,7 @@ func (s *server) initRoutes() {
 			r.Post("/create", s.pullRequestsHandlers.PostCreatePullRequest())
 			r.Post("/merge", s.pullRequestsHandlers.PostMergePullRequest())
 			r.Post("/reassign", s.pullRequestsHandlers.PostReassignReviewerPullRequest())
+			r.Get("/stats", s.pullRequestsHandlers.GetPullRequestsStats())
 		})
 	})
 

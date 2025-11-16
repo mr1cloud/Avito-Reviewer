@@ -137,3 +137,29 @@ func (h *Handlers) PostReassignReviewerPullRequest() http.HandlerFunc {
 		})
 	}
 }
+
+// GetPullRequestsStats godoc
+//
+//	@Summary		Get pull requests statistics
+//	@Description	Retrieves statistics about pull requests.
+//	@Tags			PullRequests
+//	@Produce		json
+//	@Success		200	{object}	PullRequestsStatsResponse
+//	@Failure		500	{object}	model.ErrorResponse
+//	@Router			/pullRequest/stats [get]
+func (h *Handlers) GetPullRequestsStats() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		stats, err := h.PullRequests.GetPullRequestsStats(r.Context())
+		if err != nil {
+			var srvErr serviceerrors.ServiceError
+			if errors.As(err, &srvErr) {
+				tools.RespondWithError(w, srvErr.ErrorStatusCode(), srvErr.Code(), srvErr.Error())
+			} else {
+				tools.RespondWithError(w, http.StatusInternalServerError, "FATAL", "Internal server error")
+			}
+			return
+		}
+
+		tools.RespondJSON(w, http.StatusOK, stats)
+	}
+}

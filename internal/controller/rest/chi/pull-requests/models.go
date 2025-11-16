@@ -21,3 +21,7 @@ type PullRequestResponse struct {
 	PullRequest model.PullRequest `json:"pr"`
 	ReplacedBy  *string           `json:"replaced_by,omitempty"`
 }
+
+type PullRequestsStatsResponse struct {
+	Stats map[string]int `json:"stats"`
+}

@@ -20,4 +20,6 @@ type PullRequestsRepository interface {
 	UpdatePullRequestAssignedReviewers(ctx context.Context, pullRequestId string, oldAssignedReviewer string, newAssignedReviewers model.TeamMember) error
 	// SelectPullRequestsAssignedToUser retrieves all pull requests where the given user is assigned as a reviewer.
 	SelectPullRequestsAssignedToUser(ctx context.Context, userId string) ([]model.PullRequestShort, error)
+	// GetPullRequestsStats retrieves statistics about pull requests.
+	GetPullRequestsStats(ctx context.Context) (map[string]int, error)
 }

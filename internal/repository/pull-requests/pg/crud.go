@@ -173,3 +173,38 @@ func (p *PullRequestsRepository) SelectPullRequestsAssignedToUser(ctx context.Co
 
 	return prs, nil
 }
+
+func (p *PullRequestsRepository) GetPullRequestsStats(ctx context.Context) (map[string]int, error) {
+	stats := map[string]int{
+		"OPEN":   0,
+		"MERGED": 0,
+	}
+
+	query := `
+	SELECT status, COUNT(*) AS count
+	FROM pull_requests
+	GROUP BY status;
+	`
+	rows, err := p.DB.QueryContext(ctx, query)
+	if err != nil {
+		p.Logger.Errorf("error getting pull requests stats: %v", err)
+		return nil, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var status string
+		var count int
+		if err := rows.Scan(&status, &count); err != nil {
+			p.Logger.Errorf("error scanning pull requests stats row: %v", err)
+			return nil, err
+		}
+		stats[status] = count
+	}
+	if err := rows.Err(); err != nil {
+		p.Logger.Errorf("error iterating over pull requests stats rows: %v", err)
+		return nil, err
+	}
+
+	return stats, nil
+}

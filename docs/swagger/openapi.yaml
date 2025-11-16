@@ -115,6 +115,13 @@ components:
         replaced_by:
           type: string
       type: object
+    pull_requests.PullRequestsStatsResponse:
+      properties:
+        stats:
+          additionalProperties:
+            type: integer
+          type: object
+      type: object
     pull_requests.ReassignReviewerPrRequest:
       properties:
         old_reviewer_id:
@@ -263,6 +270,25 @@ paths:
                 $ref: '#/components/schemas/model.ErrorResponse'
           description: Internal Server Error
       summary: Reassign a reviewer for a pull request
+      tags:
+      - PullRequests
+  /pullRequest/stats:
+    get:
+      description: Retrieves statistics about pull requests.
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/pull_requests.PullRequestsStatsResponse'
+          description: OK
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/model.ErrorResponse'
+          description: Internal Server Error
+      summary: Get pull requests statistics
       tags:
       - PullRequests
   /team/add:
